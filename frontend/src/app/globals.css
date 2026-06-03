@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --brand-red: #e31e24;
+  --brand-red-dark: #b9151a;
+  --brand-red-light: #ff4d52;
+  --brand-white: #ffffff;
+  --brand-black: #0a0a0a;
+  --background: #fafafa;
+  --foreground: #1a1a1a;
+  --card: rgba(255, 255, 255, 0.85);
+  --border: rgba(227, 30, 36, 0.15);
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #f5f5f5;
+  --card: rgba(20, 20, 20, 0.88);
+  --border: rgba(227, 30, 36, 0.25);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.glass {
+  background: var(--card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px rgba(227, 30, 36, 0.06);
+}
+
+.gradient-hero {
+  background: linear-gradient(
+    135deg,
+    #0a0a0a 0%,
+    #1a0506 35%,
+    var(--brand-red-dark) 70%,
+    var(--brand-red) 100%
+  );
+}
+
+.text-brand {
+  color: var(--brand-red);
+}
+
+.text-accent-light {
+  color: #fecaca;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-xl px-5 py-2.5 font-semibold text-white transition;
+  background: linear-gradient(135deg, var(--brand-red-dark), var(--brand-red));
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+.btn-accent {
+  @apply inline-flex items-center justify-center rounded-xl px-5 py-2.5 font-semibold transition;
+  background: var(--brand-white);
+  color: var(--brand-red-dark);
+}
+
+.btn-accent:hover {
+  background: #f5f5f5;
+}

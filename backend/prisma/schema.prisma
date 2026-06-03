@@ -1,0 +1,298 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LEAVE
+  HOLIDAY
+}
+
+enum FeeType {
+  MONTHLY
+  ADMISSION
+  SPECIAL
+}
+
+enum PaymentMode {
+  CASH
+  UPI
+  BANK_TRANSFER
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NoticeAudience {
+  ALL_STUDENTS
+  CLASS_WISE
+  TEACHERS
+}
+
+model Admin {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  name         String    @default("Administrator")
+  email        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+  auditLogs    AuditLog[]
+}
+
+model Teacher {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  passwordHash  String
+  name          String
+  mobile        String
+  email         String    @unique
+  qualification String
+  subject       String
+  address       String
+  joiningDate   DateTime
+  photoUrl      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+  attendances   Attendance[]
+  homeworks     Homework[]
+  tests         Test[]
+  leaveRequests LeaveRequest[]
+  notifications Notification[]
+}
+
+model Student {
+  id              String    @id @default(cuid())
+  username        String    @unique
+  passwordHash    String
+  studentName     String
+  fatherName      String
+  motherName      String
+  mobile          String
+  alternateMobile String?
+  email           String?
+  classLevel      String
+  schoolName      String
+  address         String
+  admissionDate   DateTime
+  photoUrl        String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+  attendances     Attendance[]
+  feeAssignments  FeeAssignment[]
+  feePayments     FeePayment[]
+  testResults     TestResult[]
+  notifications   Notification[]
+}
+
+model Attendance {
+  id         String           @id @default(cuid())
+  date       DateTime
+  status     AttendanceStatus
+  notes      String?
+  markedBy   Role
+  studentId  String?
+  student    Student?         @relation(fields: [studentId], references: [id])
+  teacherId  String?
+  teacher    Teacher?         @relation(fields: [teacherId], references: [id])
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  deletedAt  DateTime?
+
+  @@unique([studentId, date])
+  @@unique([teacherId, date])
+  @@index([date])
+}
+
+model Homework {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  subject     String
+  classLevel  String
+  dueDate     DateTime
+  teacherId   String
+  teacher     Teacher   @relation(fields: [teacherId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([classLevel])
+}
+
+model Test {
+  id         String       @id @default(cuid())
+  name       String
+  subject    String
+  classLevel String
+  testDate   DateTime
+  testTime   String
+  totalMarks Int
+  teacherId  String?
+  teacher    Teacher?     @relation(fields: [teacherId], references: [id])
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  deletedAt  DateTime?
+  results    TestResult[]
+
+  @@index([classLevel])
+}
+
+model TestResult {
+  id        String    @id @default(cuid())
+  testId    String
+  test      Test      @relation(fields: [testId], references: [id])
+  studentId String
+  student   Student   @relation(fields: [studentId], references: [id])
+  marks     Int?
+  remarks   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([testId, studentId])
+}
+
+model FeeStructure {
+  id          String    @id @default(cuid())
+  name        String
+  feeType     FeeType
+  amount      Decimal
+  classLevel  String?
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  assignments FeeAssignment[]
+}
+
+model FeeAssignment {
+  id             String       @id @default(cuid())
+  studentId      String
+  student        Student      @relation(fields: [studentId], references: [id])
+  feeStructureId String
+  feeStructure   FeeStructure @relation(fields: [feeStructureId], references: [id])
+  dueDate        DateTime
+  amount         Decimal
+  isPaid         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?
+  payments       FeePayment[]
+}
+
+model FeePayment {
+  id              String      @id @default(cuid())
+  assignmentId    String
+  assignment      FeeAssignment @relation(fields: [assignmentId], references: [id])
+  studentId       String
+  student         Student     @relation(fields: [studentId], references: [id])
+  amount          Decimal
+  paymentMode     PaymentMode
+  receiptNumber   String      @unique
+  paidAt          DateTime    @default(now())
+  notes           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+}
+
+model Notice {
+  id          String         @id @default(cuid())
+  title       String
+  content     String
+  audience    NoticeAudience
+  classLevel  String?
+  publishedAt DateTime       @default(now())
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime?
+}
+
+model LeaveRequest {
+  id           String      @id @default(cuid())
+  teacherId    String
+  teacher      Teacher     @relation(fields: [teacherId], references: [id])
+  startDate    DateTime
+  endDate      DateTime
+  reason       String
+  attachmentUrl String?
+  status       LeaveStatus @default(PENDING)
+  adminNotes   String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  deletedAt    DateTime?
+}
+
+model AdmissionInquiry {
+  id           String    @id @default(cuid())
+  studentName  String
+  parentName   String
+  mobile       String
+  email        String?
+  classLevel   String
+  message      String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  title     String
+  message   String
+  read      Boolean   @default(false)
+  studentId String?
+  student   Student?  @relation(fields: [studentId], references: [id])
+  teacherId String?
+  teacher   Teacher?  @relation(fields: [teacherId], references: [id])
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@index([studentId])
+  @@index([teacherId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  adminId   String?
+  admin     Admin?   @relation(fields: [adminId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+}
+
+model ArchivedRecord {
+  id         String   @id @default(cuid())
+  entityType String
+  entityId   String
+  payload    Json
+  archivedAt DateTime @default(now())
+  purgeAfter DateTime
+}
+
+model Counter {
+  id    String @id
+  value Int    @default(1000)
+}
