@@ -1,0 +1,9 @@
+# Paste these into Vercel → Project → Settings → Environment Variables (Production)
+# DELETE this file after setup — do not commit to public repos
+
+JWT_SECRET=HJoeOnjoeoGCfgvblrQfn8kKzLNbgDXZWSuNDF/c5nLgeS6ora8Kq8uY/VEY+FsF
+JWT_REFRESH_SECRET=DRmwTeBu6o1qLBC/u06fO36OZ9kuHK0jwlMV1UXGOa+dwtbWIBvvChsHj/aqNpED
+ADMIN_USERNAME=smartstep05618
+ADMIN_PASSWORD=Smartedhub123
+
+# DATABASE_URL — added automatically when you connect Vercel Postgres (do not paste manually if using Storage)
