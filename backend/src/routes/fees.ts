@@ -5,6 +5,7 @@ import { prisma } from "../lib/prisma.js";
 import { notDeleted } from "../lib/prisma.js";
 import { authenticate, authorize, type AuthRequest } from "../middleware/auth.js";
 import { FeeType, PaymentMode } from "@prisma/client";
+import { paramId } from "../utils/params.js";
 
 const router = Router();
 
@@ -164,7 +165,7 @@ router.get(
   authenticate,
   async (req, res) => {
     const payment = await prisma.feePayment.findFirst({
-      where: { id: req.params.paymentId, deletedAt: null },
+      where: { id: paramId(req, "paymentId"), deletedAt: null },
       include: {
         student: true,
         assignment: { include: { feeStructure: true } },

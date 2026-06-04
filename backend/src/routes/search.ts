@@ -17,8 +17,8 @@ router.get("/", authenticate, authorize("ADMIN"), async (req, res) => {
       where: {
         ...notDeleted,
         OR: [
-          { studentName: { contains: q, mode: "insensitive" } },
-          { username: { contains: q, mode: "insensitive" } },
+          { studentName: { contains: q } },
+          { username: { contains: q } },
           { mobile: { contains: q } },
         ],
       },
@@ -28,10 +28,7 @@ router.get("/", authenticate, authorize("ADMIN"), async (req, res) => {
     prisma.teacher.findMany({
       where: {
         ...notDeleted,
-        OR: [
-          { name: { contains: q, mode: "insensitive" } },
-          { subject: { contains: q, mode: "insensitive" } },
-        ],
+        OR: [{ name: { contains: q } }, { subject: { contains: q } }],
       },
       take: 10,
       select: { id: true, name: true, subject: true },
@@ -39,7 +36,7 @@ router.get("/", authenticate, authorize("ADMIN"), async (req, res) => {
     prisma.homework.findMany({
       where: {
         deletedAt: null,
-        title: { contains: q, mode: "insensitive" },
+        title: { contains: q },
       },
       take: 10,
       select: { id: true, title: true, classLevel: true },
@@ -47,7 +44,7 @@ router.get("/", authenticate, authorize("ADMIN"), async (req, res) => {
     prisma.notice.findMany({
       where: {
         deletedAt: null,
-        title: { contains: q, mode: "insensitive" },
+        title: { contains: q },
       },
       take: 10,
       select: { id: true, title: true },

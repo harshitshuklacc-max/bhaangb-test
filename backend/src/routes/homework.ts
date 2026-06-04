@@ -4,6 +4,7 @@ import { prisma } from "../lib/prisma.js";
 import { notDeleted } from "../lib/prisma.js";
 import { authenticate, authorize, type AuthRequest } from "../middleware/auth.js";
 import { notifyStudentsInClass } from "../services/notify.js";
+import { paramId } from "../utils/params.js";
 
 const router = Router();
 
@@ -128,7 +129,7 @@ router.put(
       return;
     }
     const existing = await prisma.homework.findFirst({
-      where: { id: req.params.id, deletedAt: null },
+      where: { id: paramId(req), deletedAt: null },
     });
     if (!existing) {
       res.status(404).json({ error: "Homework not found" });
@@ -143,7 +144,7 @@ router.put(
     }
     const data = parsed.data;
     const homework = await prisma.homework.update({
-      where: { id: req.params.id },
+      where: { id: paramId(req) },
       data: {
         ...data,
         dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
@@ -159,7 +160,7 @@ router.delete(
   authorize("TEACHER", "ADMIN"),
   async (req: AuthRequest, res) => {
     const existing = await prisma.homework.findFirst({
-      where: { id: req.params.id, deletedAt: null },
+      where: { id: paramId(req), deletedAt: null },
     });
     if (!existing) {
       res.status(404).json({ error: "Not found" });
@@ -173,7 +174,7 @@ router.delete(
       return;
     }
     await prisma.homework.update({
-      where: { id: req.params.id },
+      where: { id: paramId(req) },
       data: { deletedAt: new Date() },
     });
     res.json({ success: true });

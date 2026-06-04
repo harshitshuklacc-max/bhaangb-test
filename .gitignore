@@ -7,3 +7,7 @@ dist/
 .DS_Store
 coverage/
 .turbo/
+.tools/
+.cursor/
+backend/prisma/dev.db
+backend/prisma/dev.db-journal

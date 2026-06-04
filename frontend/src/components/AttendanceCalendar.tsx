@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 type Status = "PRESENT" | "ABSENT" | "LEAVE" | "HOLIDAY";
 
-interface Record {
+interface AttendanceRecord {
   id: string;
   date: string;
   status: Status;
@@ -37,8 +37,8 @@ export function AttendanceCalendar({
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
-  const [records, setRecords] = useState<Record[]>([]);
-  const [selected, setSelected] = useState<Record | null>(null);
+  const [records, setRecords] = useState<AttendanceRecord[]>([]);
+  const [selected, setSelected] = useState<AttendanceRecord | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams({
@@ -47,7 +47,7 @@ export function AttendanceCalendar({
     });
     if (studentId) params.set("studentId", studentId);
     if (teacherId) params.set("teacherId", teacherId);
-    api<{ records: Record[] }>(`/attendance/calendar?${params}`)
+    api<{ records: AttendanceRecord[] }>(`/attendance/calendar?${params}`)
       .then((d) => setRecords(d.records))
       .catch(() => setRecords([]));
   }, [year, month, studentId, teacherId]);
@@ -56,7 +56,7 @@ export function AttendanceCalendar({
   const firstDay = new Date(year, month - 1, 1).getDay();
 
   const byDate = useMemo(() => {
-    const map = new Map<string, Record>();
+    const map = new Map<string, AttendanceRecord>();
     records.forEach((r) => {
       const key = new Date(r.date).toISOString().slice(0, 10);
       map.set(key, r);

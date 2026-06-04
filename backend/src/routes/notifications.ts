@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { authenticate, type AuthRequest } from "../middleware/auth.js";
+import { paramId } from "../utils/params.js";
 
 const router = Router();
 
@@ -23,7 +24,7 @@ router.get("/", authenticate, async (req: AuthRequest, res) => {
 
 router.patch("/:id/read", authenticate, async (req, res) => {
   await prisma.notification.update({
-    where: { id: req.params.id },
+    where: { id: paramId(req) },
     data: { read: true },
   });
   res.json({ success: true });

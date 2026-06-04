@@ -4,6 +4,7 @@ import { prisma } from "../lib/prisma.js";
 import { notDeleted } from "../lib/prisma.js";
 import { authenticate, authorize, type AuthRequest } from "../middleware/auth.js";
 import { notifyStudentsInClass } from "../services/notify.js";
+import { paramId } from "../utils/params.js";
 
 const router = Router();
 
@@ -110,7 +111,7 @@ router.post(
       res.status(400).json({ error: "Invalid payload" });
       return;
     }
-    const testId = req.params.id;
+    const testId = paramId(req);
     for (const r of parsed.data.results) {
       await prisma.testResult.upsert({
         where: {
@@ -135,7 +136,7 @@ router.get(
   authorize("ADMIN", "TEACHER"),
   async (req, res) => {
     const results = await prisma.testResult.findMany({
-      where: { testId: req.params.id, deletedAt: null },
+      where: { testId: paramId(req), deletedAt: null },
       include: {
         student: { select: { studentName: true, classLevel: true } },
       },

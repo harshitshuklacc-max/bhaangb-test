@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { api } from "@/lib/api";
+import { api, getApiBaseUrl } from "@/lib/api";
 
 export default function TeacherLeavePage() {
   const [items, setItems] = useState<{ id: string; status: string; reason: string }[]>([]);
@@ -26,7 +26,7 @@ export default function TeacherLeavePage() {
     fd.append("reason", form.reason);
     const token = localStorage.getItem("accessToken");
     await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api"}/leave`,
+      `${getApiBaseUrl()}/leave`,
       {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},

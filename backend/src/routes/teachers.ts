@@ -13,6 +13,7 @@ import { softDelete } from "../utils/softDelete.js";
 import { logAudit } from "../services/audit.js";
 import { uploadImage } from "../services/cloudinary.js";
 import { sendCredentialsEmail } from "../services/email.js";
+import { paramId } from "../utils/params.js";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = Router();
@@ -37,9 +38,9 @@ router.get("/", authenticate, authorize("ADMIN"), async (req, res) => {
     ...(search
       ? {
           OR: [
-            { name: { contains: search, mode: "insensitive" as const } },
-            { subject: { contains: search, mode: "insensitive" as const } },
-            { email: { contains: search, mode: "insensitive" as const } },
+            { name: { contains: search } },
+            { subject: { contains: search } },
+            { email: { contains: search } },
           ],
         }
       : {}),
@@ -135,7 +136,7 @@ router.put(
       return;
     }
     const existing = await prisma.teacher.findFirst({
-      where: { id: req.params.id, ...notDeleted },
+      where: { id: paramId(req), ...notDeleted },
     });
     if (!existing) {
       res.status(404).json({ error: "Teacher not found" });
@@ -150,7 +151,7 @@ router.put(
 
     const data = parsed.data;
     const teacher = await prisma.teacher.update({
-      where: { id: req.params.id },
+      where: { id: paramId(req) },
       data: {
         ...data,
         joiningDate: data.joiningDate ? new Date(data.joiningDate) : undefined,
@@ -169,7 +170,7 @@ router.delete(
   authorize("ADMIN"),
   async (req: AuthRequest, res) => {
     const teacher = await prisma.teacher.findFirst({
-      where: { id: req.params.id, ...notDeleted },
+      where: { id: paramId(req), ...notDeleted },
     });
     if (!teacher) {
       res.status(404).json({ error: "Teacher not found" });
@@ -191,7 +192,7 @@ router.post(
   async (req, res) => {
     const { password } = req.body as { password: string };
     const teacher = await prisma.teacher.findFirst({
-      where: { id: req.params.id, ...notDeleted },
+      where: { id: paramId(req), ...notDeleted },
     });
     if (!teacher) {
       res.status(404).json({ error: "Teacher not found" });

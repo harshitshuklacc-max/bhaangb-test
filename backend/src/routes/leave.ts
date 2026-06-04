@@ -4,6 +4,7 @@ import multer from "multer";
 import { prisma } from "../lib/prisma.js";
 import { authenticate, authorize, type AuthRequest } from "../middleware/auth.js";
 import { uploadImage } from "../services/cloudinary.js";
+import { paramId } from "../utils/params.js";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = Router();
@@ -89,7 +90,7 @@ router.patch(
       return;
     }
     const leave = await prisma.leaveRequest.update({
-      where: { id: req.params.id },
+      where: { id: paramId(req) },
       data: {
         status: parsed.data.status,
         adminNotes: parsed.data.adminNotes,

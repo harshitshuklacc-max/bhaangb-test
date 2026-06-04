@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { api } from "@/lib/api";
+import { api, getApiBaseUrl } from "@/lib/api";
 
 interface Teacher {
   id: string;
@@ -42,7 +42,7 @@ export default function AdminTeachersPage() {
     Object.entries(form).forEach(([k, v]) => fd.append(k, v));
     const token = localStorage.getItem("accessToken");
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api"}/teachers`,
+      `${getApiBaseUrl()}/teachers`,
       {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},

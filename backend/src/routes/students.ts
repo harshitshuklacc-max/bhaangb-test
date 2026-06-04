@@ -13,6 +13,7 @@ import { softDelete } from "../utils/softDelete.js";
 import { logAudit } from "../services/audit.js";
 import { uploadImage } from "../services/cloudinary.js";
 import { sendCredentialsEmail } from "../services/email.js";
+import { paramId } from "../utils/params.js";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = Router();
@@ -46,9 +47,9 @@ router.get(
       ...(search
         ? {
             OR: [
-              { studentName: { contains: search, mode: "insensitive" as const } },
+              { studentName: { contains: search } },
               { mobile: { contains: search } },
-              { username: { contains: search, mode: "insensitive" as const } },
+              { username: { contains: search } },
             ],
           }
         : {}),
@@ -84,7 +85,7 @@ router.get(
   authorize("ADMIN"),
   async (req, res) => {
     const student = await prisma.student.findFirst({
-      where: { id: req.params.id, ...notDeleted },
+      where: { id: paramId(req), ...notDeleted },
     });
     if (!student) {
       res.status(404).json({ error: "Student not found" });
@@ -166,7 +167,7 @@ router.put(
       return;
     }
     const existing = await prisma.student.findFirst({
-      where: { id: req.params.id, ...notDeleted },
+      where: { id: paramId(req), ...notDeleted },
     });
     if (!existing) {
       res.status(404).json({ error: "Student not found" });
@@ -181,7 +182,7 @@ router.put(
 
     const data = parsed.data;
     const student = await prisma.student.update({
-      where: { id: req.params.id },
+      where: { id: paramId(req) },
       data: {
         ...data,
         email: data.email === "" ? null : data.email,
@@ -210,7 +211,7 @@ router.delete(
   authorize("ADMIN"),
   async (req: AuthRequest, res) => {
     const student = await prisma.student.findFirst({
-      where: { id: req.params.id, ...notDeleted },
+      where: { id: paramId(req), ...notDeleted },
     });
     if (!student) {
       res.status(404).json({ error: "Student not found" });
@@ -238,7 +239,7 @@ router.post(
   async (req, res) => {
     const { password, email } = req.body as { password: string; email?: string };
     const student = await prisma.student.findFirst({
-      where: { id: req.params.id, ...notDeleted },
+      where: { id: paramId(req), ...notDeleted },
     });
     if (!student) {
       res.status(404).json({ error: "Student not found" });
@@ -266,7 +267,7 @@ router.post(
   authorize("ADMIN"),
   async (req: AuthRequest, res) => {
     const student = await prisma.student.findFirst({
-      where: { id: req.params.id, ...notDeleted },
+      where: { id: paramId(req), ...notDeleted },
     });
     if (!student) {
       res.status(404).json({ error: "Student not found" });

@@ -1,4 +1,17 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+function resolveApiUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
+  }
+  if (typeof window !== "undefined") {
+    return `${window.location.origin}/api`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}/api`;
+  }
+  return "http://localhost:3000/api";
+}
+
+const API_URL = resolveApiUrl();
 
 export type UserRole = "ADMIN" | "TEACHER" | "STUDENT";
 
@@ -69,4 +82,8 @@ export async function logout() {
 
 export async function getMe() {
   return api<AuthUser>("/auth/me");
+}
+
+export function getApiBaseUrl(): string {
+  return API_URL;
 }
