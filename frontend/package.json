@@ -3,17 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "npm run build:api && npm run build:web",
-    "vercel-build": "npm run build:api && npm run build:vercel-db && npm run build:web",
-    "build:vercel-db": "node scripts/vercel-db-setup.mjs",
-    "build:api": "cd ../backend && npm run build",
-    "build:web": "prisma generate --schema=../backend/prisma/schema.prisma && next build",
-    "postinstall": "prisma generate --schema=../backend/prisma/schema.prisma",
-    "start": "next start",
-    "lint": "next lint",
-    "db:push": "prisma db push --schema=../backend/prisma/schema.prisma",
-    "db:seed": "cd ../backend && npm run db:seed"
+    "scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint"
+}
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
